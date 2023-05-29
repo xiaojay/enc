@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -14,7 +15,6 @@ func main() {
 		Flags: []cli.Flag{
 			&cli.StringFlag{Name: "input", Usage: "input file", Aliases: []string{"i"}},
 			&cli.StringFlag{Name: "output", Usage: "output file", Aliases: []string{"o"}},
-			&cli.StringFlag{Name: "password", Usage: "password", Aliases: []string{"p"}},
 			&cli.BoolFlag{Name: "decode", Value: false, Usage: "decode file or not", Aliases: []string{"d"}},
 		},
 		Action: run,
@@ -27,6 +27,10 @@ func main() {
 }
 
 func run(c *cli.Context) (err error) {
+	var password string
+	fmt.Print("password:")
+	fmt.Scanf("%s", &password)
+
 	file, err := os.Open(c.String("input"))
 	if err != nil {
 		return
@@ -40,9 +44,9 @@ func run(c *cli.Context) (err error) {
 
 	s := string(data)
 	if c.Bool("decode") {
-		s = Decrypt(c.String("password"), s)
+		s = Decrypt(password, s)
 	} else {
-		s = Encrypt(c.String("password"), s)
+		s = Encrypt(password, s)
 	}
 
 	by := []byte(s)
