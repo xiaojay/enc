@@ -1,12 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
 
 	"github.com/urfave/cli/v2"
+	"golang.org/x/term"
 )
 
 func main() {
@@ -27,9 +27,10 @@ func main() {
 }
 
 func run(c *cli.Context) (err error) {
-	var password string
-	fmt.Print("password:")
-	fmt.Scanf("%s", &password)
+	password, err := term.ReadPassword(int(os.Stdin.Fd()))
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	file, err := os.Open(c.String("input"))
 	if err != nil {
@@ -44,9 +45,9 @@ func run(c *cli.Context) (err error) {
 
 	s := string(data)
 	if c.Bool("decode") {
-		s = Decrypt(password, s)
+		s = Decrypt(string(password), s)
 	} else {
-		s = Encrypt(password, s)
+		s = Encrypt(string(password), s)
 	}
 
 	by := []byte(s)
